@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-ngx
+spec:
+  selector:
+    matchLabels:
+      app: web-ngx
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: web-ngx
+    spec:
+      imagePullSecrets:
+      - name: aliyun-niudin
+      containers:
+      - name: nginx
+        image: registry.cn-beijing.aliyuncs.com/niudin/nginx:v5
+        imagePullPolicy: Always
+        #imagePullPolicy: IfNotPresent
+        ports:
+        - name: http
+          containerPort: 80
+        - name: https
+          containerPort: 443
+        volumeMounts:
+        - name: ngx-conf
+          mountPath: /usr/local/openresty/nginx/conf/nginx.conf
+          subPath: nginx.conf
+          readOnly: true
+        - name: backends
+          mountPath: /usr/local/openresty/nginx/conf/backends.conf
+          subPath: backends.conf
+          readOnly: true
+        - name: ngx-logs
+          mountPath: /data/logs/nginx/
+      volumes:
+      - name: ngx-conf
+        configMap:
+          name: ngx-conf
+      - name: backends
+        configMap:
+          name: backends
+      - name: ngx-logs
+        hostPath:
+          path: /data/logs/nginx/   

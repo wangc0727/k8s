@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-demo
+  namespace: default
+  labels:
+    app: myap
+    tier: frontend
+  annotations:
+    niudin.com/create-by: 'test'
+spec:
+  containers:
+  - name: myapp
+    image: nginx
+    imagePullPolicy: IfNotPresent
+    volumeMounts:
+    - name: html
+      mountPath: /usr/share/nginx/html/
+    ports:
+    - name: http
+      containerPort: 80 
+    - name: https
+      containerPort: 443
+  - name: busybox
+    image: busybox:latest
+    imagePullPolicy: IfNotPresent
+    volumeMounts:
+    - name: html
+      mountPath: /data/
+    command:
+    - "/bin/sh"
+    - "-c"
+    - "while : ;do echo `date` >> /data/index.html;sleep 2; done"
+  volumes:
+  - name: html
+    emptyDir: {}

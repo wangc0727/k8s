@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-ngx
+spec:
+  selector:
+    matchLabels:
+      app: web-ngx
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: web-ngx
+    spec:
+      containers:
+      - name: nginx
+        image: registry.cn-beijing.aliyuncs.com/niudin/nginx:v1
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: ngx-data
+          mountPath: /data/www
+        - name: ngx-conf
+          mountPath: /usr/local/openresty/nginx/conf/vhosts/
+        - name: ngx-logs
+          mountPath: /data/logs/nginx
+      volumes:
+      - name: ngx-data
+        persistentVolumeClaim:
+          claimName: ngx-data
+      - name: ngx-conf
+        persistentVolumeClaim:
+          claimName: ngx-conf
+      - name: ngx-logs
+        persistentVolumeClaim:
+          claimName: ngx-logs

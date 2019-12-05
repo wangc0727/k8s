@@ -1,0 +1,12 @@
+#!/bin/bash
+#by wangc
+cd /data/logs/nginx
+LDATE=`date --date '1 day ago' "+%Y%m%d"`
+for logfile in `ls -l *.log|grep -v error|awk '{print $NF}'`;do
+mv /data/logs/nginx/${logfile} /data/logs/nginx/archive/${logfile}.$LDATE;
+sleep 1;
+gzip -9 /data/logs/nginx/archive/${logfile}.$LDATE;
+done
+
+kill -USR1 `cat /data/logs/nginx/nginx.pid`
+find /data/logs/nginx/archive/ -type f -name '*.gz' -mtime +30 -exec rm -f {} \;

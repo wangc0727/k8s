@@ -1,0 +1,83 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: gitlab
+spec:
+  ports:
+  - name: git-http
+    port: 80
+    protocol: TCP
+    targetPort: 80
+  - name: git-https
+    port: 443
+    protocol: TCP
+    targetPort: 443
+  - name: git-ssh
+    port: 22
+    protocol: TCP
+    targetPort: 22
+  clusterIP: None
+  selector:
+    app: gitlab
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: gitlab
+spec:
+  serviceName: "gitlab"
+  selector:
+    matchLabels:
+      app: gitlab
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: gitlab
+    spec:
+      containers:
+      - name: gitlab
+        image: gitlab/gitlab-ce:latest
+        #imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: TZ
+          value: "Asia/Shanghai"
+        ports:
+        - name: git-http
+          containerPort: 80
+        - name: git-https
+          containerPort: 443
+        - name: git-ssh
+          containerPort: 22
+        volumeMounts:
+        - name: git-config
+          mountPath: /etc/gitlab
+        volumeMounts:
+        - name: git-logs
+          mountPath: /var/log/gitlab
+        volumeMounts:
+        - name: git-data
+          mountPath: /var/opt/gitlab
+  volumeClaimTemplates:
+  - metadata:
+      name: git-config
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi
+  - metadata:
+      name: git-logs
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 5Gi
+  - metadata:
+      name: git-data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 5Gi
