@@ -1,0 +1,28 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ingress-tomcat
+  namespace: default
+  #annotations:
+  #  kubernetes.io/ingress.class: "nginx"
+spec:
+  tls:
+  - hosts:
+    - tomcat.niudin.com
+    secretName: test
+  rules:
+  - host: tomcat.niudin.com
+    http:
+      paths:
+      - path:
+        backend:
+          serviceName: tomcat
+          servicePort: 8080
+  - host: tomcat.niudin.com
+    httpd:
+      paths:
+      - path:
+        backend:
+          serviceName: tomcat
+          servicePort: 8080
+      

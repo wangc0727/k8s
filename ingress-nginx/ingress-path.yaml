@@ -1,0 +1,24 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ingress-path
+  namespace: default
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  rules:
+  - host: test.niudin.com
+    http:
+      paths:
+      - path: /jks
+        backend:
+          serviceName: jenkins
+          servicePort: 8080
+  - host: test.niudin.com
+    http:
+      paths:
+      - path: /git
+        backend:
+          serviceName: gitlab
+          servicePort: 80
+
